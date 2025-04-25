@@ -17,11 +17,10 @@ box_width = 1.2
 height = 0.8
 
 # Typen-Daten
+# Strings mit '\n' innerhalb der Literalien, keine echten Zeilenumbrüche
 types = [
-    {"name": "Erstanwendungs-
-studien 10", "fill": "#D2B4DE", "y": 1 + row_sep},
-    {"name": "klassische PK-
-Studien 30", "fill": "#AED6F1", "y": 1}
+    {"name": "Erstanwendungs-\nstudien 10", "fill": "#D2B4DE", "y": 1 + row_sep},
+    {"name": "klassische PK-\nStudien 30",    "fill": "#AED6F1", "y": 1}
 ]
 
 # Werte für Kategorien
@@ -34,74 +33,66 @@ vals = {
 }
 
 # Knoten generieren
-nodes = []
-for i, typ in enumerate(types):
-    y0 = typ["y"]
-    x_vals = [1, 2, 2, 3, 4, 5]
-    y_offsets = [
-        y0,
-        y0 + vert_offset + box_spacing,
-        y0 - vert_offset - box_spacing,
-        y0,
-        y0,
-        y0
-    ]
-    labels = [
-        typ["name"],
-        f"< 31 Tage
-{vals['a'][i]}",
-        f"> 31 Tage
-{vals['b'][i]}",
-        f"Tage ab Validierung
-{vals['c'][i]}",
-        f"Keine
-Validierungsprobleme
-{vals['e'][i]}",
-        f"Anzahl Rückfragen
-{vals['d'][i]}"
-    ]
-    for x, y, label in zip(x_vals, y_offsets, labels):
-        nodes.append({
-            "x": x,
-            "y": y,
-            "label": label,
-            "fill": typ["fill"],
-            "xmin": x - box_width/2,
-            "xmax": x + box_width/2,
-            "ymin": y - height/2,
-            "ymax": y + height/2
-        })
+def generate_nodes(types, vals):
+    nodes = []
+    for i, typ in enumerate(types):
+        y0 = typ["y"]
+        x_vals = [1, 2, 2, 3, 4, 5]
+        y_offsets = [
+            y0,
+            y0 + vert_offset + box_spacing,
+            y0 - vert_offset - box_spacing,
+            y0, y0, y0
+        ]
+        labels = [
+            typ["name"],
+            f"< 31 Tage\n{vals['a'][i]}",
+            f"> 31 Tage\n{vals['b'][i]}",
+            f"Tage ab Validierung\n{vals['c'][i]}",
+            f"Keine Validierungsprobleme\n{vals['e'][i]}",
+            f"Anzahl Rückfragen\n{vals['d'][i]}"
+        ]
+        for x, y, label in zip(x_vals, y_offsets, labels):
+            nodes.append({
+                "x": x,
+                "y": y,
+                "label": label,
+                "fill": typ["fill"],
+                "xmin": x - box_width/2,
+                "xmax": x + box_width/2,
+                "ymin": y - height/2,
+                "ymax": y + height/2
+            })
+    return nodes
+
+nodes = generate_nodes(types, vals)
 
 # Plot erstellen
 fig, ax = plt.subplots(figsize=(12, 8))
 for node in nodes:
     rect = Rectangle(
-        (node["xmin"], node["ymin"]),
-        box_width, height,
-        facecolor=node["fill"],
-        edgecolor="black",
-        linewidth=0.8
+        (node["xmin"], node["ymin"]), box_width, height,
+        facecolor=node["fill"], edgecolor="black", linewidth=0.8
     )
     ax.add_patch(rect)
     ax.text(
         node["x"], node["y"], node["label"],
-        ha="center", va="center",
-        fontsize=11, wrap=True
+        ha="center", va="center", fontsize=11, wrap=True
     )
 
 # Titel und Achsen
 t = fig.suptitle("FIH vs PK-Studien", fontsize=20)
-t.set_y(1 - title_margin / (fig.get_figheight() * fig.dpi))
+t.set_y(1 - title_margin/(fig.get_figheight()*fig.dpi))
 ax.set_xlim(0.5, 5.5)
-ymin = min(node["ymin"] for node in nodes) - 0.5
-ymax = max(node["ymax"] for node in nodes) + 0.5
+ymin = min(n['ymin'] for n in nodes) - 0.5
+ymax = max(n['ymax'] for n in nodes) + 0.5
 ax.set_ylim(ymin, ymax)
 ax.axis("off")
 plt.tight_layout()
 
 # SVG in-memory erzeugen
 buffer = io.BytesIO()
-fig.savefig(buffer, format='svg', bbox_inches='tight')
+fig.savefig(buffer, format="svg", bbox_inches="tight")
 svg_data = buffer.getvalue().decode('utf-8')
 
 # SVG inline anzeigen
