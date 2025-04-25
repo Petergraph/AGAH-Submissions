@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
-import cairosvg
 
-# Feste Parameter (statt Shiny-Slider)
+# Feste Parameter
 row_sep = 3.0         # Abstand zwischen den Reihen (Typen)
 vert_offset = 0.8     # Abstand Unterkategorien (<31/>31 Tage)
 title_margin = 10     # Abstand des Titels nach unten
@@ -70,29 +69,39 @@ for i, typ in enumerate(types):
         node["ymax"] = node["y"] + node["height"]/2
         nodes.append(node)
 
-# Plot
-fig, ax = plt.subplots(figsize=(12, 8))  # Increased figure size
+# Plot anlegen
+fig, ax = plt.subplots(figsize=(12, 8))
+
+# Boxen zeichnen
 for node in nodes:
     rect = Rectangle(
         (node["xmin"], node["ymin"]),
         node["width"], node["height"],
-        facecolor=node["fill"], edgecolor="black", linewidth=0.8
+        facecolor=node["fill"],
+        edgecolor="black",
+        linewidth=0.8
     )
     ax.add_patch(rect)
     ax.text(
         node["x"], node["y"], node["label"],
-        ha="center", va="center", fontsize=11, wrap=True
+        ha="center", va="center",
+        fontsize=11, wrap=True
     )
 
-plt.title("FIH vs PK-Studien", fontsize=20, pad=title_margin)  # Changed title
+# Titel
+plt.title("FIH vs PK-Studien", fontsize=20, pad=title_margin)
+
+# Achsen anpassen
 ax.set_xlim(0.5, 5.5)
 ymin = min(node["ymin"] for node in nodes) - 0.5
 ymax = max(node["ymax"] for node in nodes) + 0.5
 ax.set_ylim(ymin, ymax)
-ax.axis('off')
+ax.axis("off")
 plt.tight_layout()
 
-# Save as SVG using cairosvg
-plt.savefig("studien_design_temp.png")  # Save as temporary PNG
-cairosvg.svg_from_png("studien_design_temp.png", write_to="studien_design.svg")  # Convert to SVG
+# Direkt als SVG speichern
+plt.savefig("studien_design.svg", format="svg", bbox_inches="tight")
+
+# Optional: anzeigen
 plt.show()
+
