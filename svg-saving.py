@@ -21,7 +21,7 @@ types = [
     {"name": "Erstanwendungs-
 studien 10", "fill": "#D2B4DE", "y": 1 + row_sep},
     {"name": "klassische PK-
-Studien 30",    "fill": "#AED6F1", "y": 1}
+Studien 30", "fill": "#AED6F1", "y": 1}
 ]
 
 # Werte für Kategorien
@@ -42,7 +42,9 @@ for i, typ in enumerate(types):
         y0,
         y0 + vert_offset + box_spacing,
         y0 - vert_offset - box_spacing,
-        y0, y0, y0
+        y0,
+        y0,
+        y0
     ]
     labels = [
         typ["name"],
@@ -91,8 +93,8 @@ for node in nodes:
 t = fig.suptitle("FIH vs PK-Studien", fontsize=20)
 t.set_y(1 - title_margin / (fig.get_figheight() * fig.dpi))
 ax.set_xlim(0.5, 5.5)
-ymin = min(n['ymin'] for n in nodes) - 0.5
-ymax = max(n['ymax'] for n in nodes) + 0.5
+ymin = min(node["ymin"] for node in nodes) - 0.5
+ymax = max(node["ymax"] for node in nodes) + 0.5
 ax.set_ylim(ymin, ymax)
 ax.axis("off")
 plt.tight_layout()
